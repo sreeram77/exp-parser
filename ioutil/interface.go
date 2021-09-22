@@ -1,6 +1,8 @@
 package ioutil
 
+import "github.com/sreeram77/exp-parser/model"
+
 type IOUtil interface {
-	Read() ([]byte, error)
-	Write(data []byte) error
+	Read() ([]model.TestCase, error)
+	Write(data []model.TestCase) error
 }
