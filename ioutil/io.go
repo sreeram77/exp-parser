@@ -11,7 +11,7 @@ func New() IOUtil {
 	return ioutil{}
 }
 
-func (i ioutil) Read() ([]model.TestCase, error) {
+func (i ioutil) Read() (model.TestCases, error) {
 	var data = `
 testcases:
  - expression: "$color == 'red'"
@@ -24,12 +24,12 @@ testcases:
 	var t model.TestCases
 	err := yaml.Unmarshal([]byte(data), &t)
 	if err != nil {
-		return []model.TestCase{}, err
+		return model.TestCases{}, err
 	}
 
-	return t.Testcase, nil
+	return t, nil
 }
 
-func (i ioutil) Write([]model.TestCase) error {
+func (i ioutil) Write(model.TestCases) error {
 	panic("implment me")
 }
