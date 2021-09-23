@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-COPY bin/main /main
+COPY build/main /main
 
 RUN chmod +x /main
 
