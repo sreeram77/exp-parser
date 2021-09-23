@@ -53,21 +53,51 @@ type ExpEqual struct{}
 
 func (e ExpEqual) Evaluate(s string, json map[string]interface{}) bool {
 	ops := strings.Split(s, evalEqual)
+	key := strings.Trim(ops[0], evalVar)
+	value := ops[1]
 
-	op := strings.Trim(ops[0], evalVar)
-	oper := ops[1]
+	return checkEqual(key, value, json)
+}
 
-	if strings.Contains(op, evalNested) {
-		nested := strings.Split(op, evalNested)
-		val, ok := json[nested[0]]
+func checkEqual(key, value string, json interface{}) bool {
+	if strings.Contains(key, evalNested) {
+		nestedKey := strings.Split(key, evalNested)
+		switch t := json.(type) {
+		case map[interface{}]interface{}:
+			val, ok := t[nestedKey[0]]
+			if !ok {
+				return false
+			}
+
+			return checkEqual(nestedKey[1], value, val)
+		case map[string]interface{}:
+			val, ok := t[nestedKey[0]]
+			if !ok {
+				return false
+			}
+
+			return checkEqual(nestedKey[1], value, val)
+		}
+	}
+
+	switch t := json.(type) {
+	case map[interface{}]interface{}:
+		val, ok := t[key]
 		if !ok {
 			return false
 		}
 
-		oper = getNestedValue(nested[1], val)
+		return compare(value, val)
+	case map[string]interface{}:
+		val, ok := t[key]
+		if !ok {
+			return false
+		}
+
+		return compare(value, val)
 	}
 
-	return compare(oper, ops[1])
+	return false
 }
 
 func compare(op string, value interface{}) bool {
@@ -99,34 +129,6 @@ func compare(op string, value interface{}) bool {
 	return false
 }
 
-func getNestedValue(key string, json interface{}) string {
-	if strings.Contains(key, evalNested) {
-		nestedKey := strings.Split(key, evalNested)
-		switch v := json.(type) {
-		case map[interface{}]interface{}:
-			val, ok := v[key]
-			if !ok {
-				return ""
-			}
-
-			return getNestedValue(nestedKey[1], val)
-		}
-		return ""
-	}
-
-	switch v := json.(type) {
-	case map[interface{}]interface{}:
-		val, ok := v[key]
-		if !ok {
-			return ""
-		}
-
-		return val.(string)
-	}
-
-	return ""
-}
-
 type ExpNotExists struct{}
 
 func (e ExpNotExists) Evaluate(s string, json map[string]interface{}) bool {
@@ -141,7 +143,7 @@ func checkNotExists(key string, json interface{}) bool {
 		nestedKey := strings.Split(key, evalNested)
 		switch v := json.(type) {
 		case map[interface{}]interface{}:
-			val, ok := v[key]
+			val, ok := v[nestedKey[0]]
 			if !ok {
 				return true
 			}
@@ -191,7 +193,7 @@ func checkExists(key string, json interface{}) bool {
 		nestedKey := strings.Split(key, evalNested)
 		switch v := json.(type) {
 		case map[interface{}]interface{}:
-			val, ok := v[key]
+			val, ok := v[nestedKey[0]]
 			if !ok {
 				return false
 			}
