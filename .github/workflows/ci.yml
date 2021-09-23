@@ -32,10 +32,10 @@ jobs:
          mkdir bin
          CGO_ENABLED=0 GOOS=linux go build -0 bin .
 
-      - name: Upload artefacts
-        uses: actions/upload-artefact@v2
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
         with:
-          name: build artefacts
+          name: build artifacts
           path: bin
 
   dockerize:
@@ -46,10 +46,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
     
-      - name: Download artefacts
-        uses: actions/download-artefact@v2
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
         with:
-          name: build artefact
+          name: build artifact
           path: bin
 
       - name: Login to Docker Hub
