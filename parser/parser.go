@@ -12,12 +12,12 @@ func New() Parser {
 	return parser{}
 }
 
-func (p parser) Parse(data model.TestCases) (model.TestCases, error) {
+func (p parser) Parse(data model.TestCases) error {
 	for i := range data.Testcase {
 		// Parse Expression
 		res := expression.ParseExp(data.Testcase[i].Expression, data.Testcase[i].Json)
 		data.Testcase[i].ActualOutput = res
 	}
 
-	return model.TestCases{}, nil
+	return nil
 }
