@@ -1,6 +1,9 @@
 package parser
 
-import "github.com/sreeram77/exp-parser/model"
+import (
+	"github.com/sreeram77/exp-parser/expression"
+	"github.com/sreeram77/exp-parser/model"
+)
 
 type parser struct {
 }
@@ -9,13 +12,12 @@ func New() Parser {
 	return parser{}
 }
 
-func (p parser) Parse(data []model.TestCase) ([]model.TestCase, error) {
-	for i := range data {
+func (p parser) Parse(data model.TestCases) (model.TestCases, error) {
+	for i := range data.Testcase {
 		// Parse Expression
-
-		// Evaluate Expression
-
+		res := expression.ParseExp(data.Testcase[i].Expression, data.Testcase[i].Json)
+		data.Testcase[i].ActualOutput = res
 	}
 
-	return []model.TestCase{}, nil
+	return model.TestCases{}, nil
 }
