@@ -19,7 +19,13 @@ testcases:
    expected_output: true
  - expression: "$mattress.name == 'king' AND $cost == 100.0"
    json: {"color":"red","size":10,"cost":100.0,"mattress":{"name":"king"},"big":true,"legs":[{"length":4}]}
-   expected_output: true`
+   expected_output: true
+ - expression: "NOT EXISTS $color"
+   json: {"color":"red","size":10,"cost":100.0,"mattress":{"name":"king"},"big":true,"legs":[{"length":4}]}
+   expected_output: false
+ - expression: "( $cost == 100.0 AND ( $mattress.big == false ) ) OR $size == 100"
+   json: {"color":"red","size":10,"cost":100.0,"mattress":{"name":"king"},"big":true,"legs":[{"length":4}]}
+   expected_output: false`
 
 	var t model.TestCases
 	err := yaml.Unmarshal([]byte(data), &t)

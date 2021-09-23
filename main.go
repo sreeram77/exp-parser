@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/sreeram77/exp-parser/ioutil"
 	"github.com/sreeram77/exp-parser/parser"
 )
@@ -15,11 +13,14 @@ func main() {
 
 	t, err := fil.Read()
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 
 	// Call parser
-	yamlParser.Parse(t)
+	err = yamlParser.Parse(t)
+	if err != nil {
+		panic(err)
+	}
 
 	// Write response in new file
 }

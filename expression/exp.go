@@ -55,19 +55,10 @@ func evaluateSubExpression(subExp string, j map[string]interface{}) bool {
 
 func parseOR(exp string, json map[string]interface{}) bool {
 	orExps := strings.Split(exp, evalOr)
-
 	orRes := false
 
 	for i := range orExps {
 		if strings.Contains(orExps[i], evalAnd) {
-			// andExps := strings.Split(orExps[i], evalAnd)
-
-			// res := evaluateSubExpression(andExps[0], json)
-
-			// for i := range andExps {
-			// 	res = res && evaluateSubExpression(andExps[i], json)
-			// }
-
 			orExps[i] = strconv.FormatBool(parseAND(orExps[i], json))
 		}
 
