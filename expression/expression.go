@@ -19,16 +19,18 @@ const (
 )
 
 const (
-	evalEqual     = " == "
-	evalNotExists = "NOT EXISTS "
-	evalExists    = "EXISTS "
-	evalVar       = "$"
-	evalStrVal    = "'"
-	evalNested    = "."
-	evalAnd       = " AND "
-	evalOr        = " OR "
-	evalTrue      = "true"
-	evalFalse     = "false"
+	evalEqual          = " == "
+	evalNotExists      = "NOT EXISTS "
+	evalExists         = "EXISTS "
+	evalVar            = "$"
+	evalStrVal         = "'"
+	evalNested         = "."
+	evalAnd            = " AND "
+	evalOr             = " OR "
+	evalTrue           = "true"
+	evalFalse          = "false"
+	evalOpenBracket    = '('
+	evalClosingBracket = ')'
 )
 
 func Type(s string) Exp {
@@ -72,6 +74,7 @@ func compare(op string, value interface{}) bool {
 	switch v := value.(type) {
 	case string:
 		v = strings.Trim(v, evalStrVal)
+		op = strings.Trim(op, evalStrVal)
 		return v == op
 	case int:
 		val, err := strconv.Atoi(op)
