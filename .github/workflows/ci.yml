@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: |
          mkdir bin
-         CGO_ENABLED=0 GOOS=linux go build -0 bin .
+         CGO_ENABLED=0 GOOS=linux go build -o bin .
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
