@@ -25,8 +25,8 @@ const (
 	evalVar       = "$"
 	evalStrVal    = "'"
 	evalNested    = "."
-	evalAnd       = "AND"
-	evalOr        = "OR"
+	evalAnd       = " AND "
+	evalOr        = " OR "
 	evalTrue      = "true"
 	evalFalse     = "false"
 )
@@ -161,7 +161,7 @@ func checkNotExists(key string, json interface{}) bool {
 			return true
 		}
 
-		return true
+		return false
 	case map[string]interface{}:
 		_, ok := v[key]
 		if !ok {
@@ -207,14 +207,14 @@ func checkExists(key string, json interface{}) bool {
 	switch v := json.(type) {
 	case map[interface{}]interface{}:
 		_, ok := v[key]
-		if ok {
+		if !ok {
 			return false
 		}
 
 		return true
 	case map[string]interface{}:
 		_, ok := v[key]
-		if ok {
+		if !ok {
 			return false
 		}
 
