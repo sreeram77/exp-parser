@@ -1,12 +1,14 @@
 package expression
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
 
 // ParseExp parses an expression and evaluates against JSON input.
 func ParseExp(exp string, json map[string]interface{}) bool {
+	fmt.Println("parsing ", exp)
 	// Check for brackets and evaluate first
 	if strings.ContainsRune(exp, evalOpenBracket) {
 		for strings.ContainsRune(exp, evalOpenBracket) {

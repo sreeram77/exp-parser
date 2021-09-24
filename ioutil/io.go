@@ -22,6 +22,7 @@ func New(ip, op string) IOUtil {
 }
 
 func (io *ioutil) Read() (model.TestCases, error) {
+	fmt.Println("reading from file ", io.ipFilePath)
 	var err error
 
 	io.content, err = linesFromFile(io.ipFilePath)
@@ -53,6 +54,7 @@ func (io *ioutil) Read() (model.TestCases, error) {
 }
 
 func (io *ioutil) Write(t model.TestCases) error {
+	fmt.Println("writing to file ", io.opFilePath)
 	var result []bool
 
 	for _, v := range t.Testcase {
@@ -73,6 +75,8 @@ func (io *ioutil) Write(t model.TestCases) error {
 		content += string(line)
 		content += "\n"
 	}
+
+	fmt.Println("output : \n", string(content))
 
 	return os.WriteFile(io.opFilePath, []byte(content), 0644)
 }
