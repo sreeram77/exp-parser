@@ -14,89 +14,84 @@ import (
 type ioutil struct {
 	ipFilePath string
 	opFilePath string
+	content    [][]byte
 }
 
 func New(ip, op string) IOUtil {
-	return ioutil{ipFilePath: ip, opFilePath: op}
+	return &ioutil{ipFilePath: ip, opFilePath: op}
 }
 
-func (i ioutil) Read() (model.TestCases, error) {
-	data, err := os.ReadFile(i.ipFilePath)
+func (io *ioutil) Read() (model.TestCases, error) {
+	var err error
+
+	io.content, err = linesFromFile(io.ipFilePath)
 	if err != nil {
 		return model.TestCases{}, err
 	}
 
-	var dat = `
-testcases:
- - expression: "$color == 'red'"
-   json: {"color":"red","size":10,"cost":100.0,"mattress":{"name":"king"},"big":true,"legs":[{"length":4}]}
-   expected_output: true
- - expression: "$mattress.name == 'king' AND $cost == 100.0"
-   json: {"color":"red","size":10,"cost":100.0,"mattress":{"name":"king"},"big":true,"legs":[{"length":4}]}
-   expected_output: true
- - expression: "NOT EXISTS $color"
-   json: {"color":"red","size":10,"cost":100.0,"mattress":{"name":"king"},"big":true,"legs":[{"length":4}]}
-   expected_output: false
- - expression: "( $cost == 100.0 AND ( $mattress.big == false ) ) OR $size == 100"
-   json: {"color":"red","size":10,"cost":100.0,"mattress":{"name":"king"},"big":true,"legs":[{"length":4}]}
-   expected_output: false`
+	var ts []model.TestCase
 
-	fmt.Println(len(dat))
+	for i := 1; i < len(io.content); i = i + 3 {
+		var tmp []byte
+		var t model.TestCases
 
-	var t model.TestCases
-	err = yaml.Unmarshal([]byte(data), &t)
-	if err != nil {
-		return model.TestCases{}, err
+		tmp = append(tmp, io.content[0]...)
+		tmp = append(tmp, byte('\r'), byte('\n'))
+		tmp = append(tmp, io.content[i]...)
+		tmp = append(tmp, byte('\r'), byte('\n'))
+		tmp = append(tmp, io.content[i+1]...)
+
+		err := yaml.Unmarshal(tmp, &t)
+		if err != nil {
+			return model.TestCases{}, err
+		}
+
+		ts = append(ts, t.Testcase...)
 	}
 
-	return t, nil
+	return model.TestCases{Testcase: ts}, nil
 }
 
-func (i ioutil) Write(t model.TestCases) error {
+func (io *ioutil) Write(t model.TestCases) error {
 	var result []bool
 
 	for _, v := range t.Testcase {
 		result = append(result, v.ActualOutput)
 	}
 
-	lines, err := linesFromFile(i.ipFilePath)
-	if err != nil {
-		return err
-	}
-
-	lines = append(lines, "")
+	io.content = append(io.content, []byte("\r\n"))
 
 	content := ""
 	j := 0
 
-	for i, line := range lines {
+	for i, line := range io.content {
 		if i > 3 && (i-1)%3 == 0 {
 			res := fmt.Sprintf("   actual_output: %s\n", strconv.FormatBool(result[j]))
 			content += res
 			j++
 		}
-		content += line
+		content += string(line)
 		content += "\n"
 	}
 
-	return os.WriteFile(i.opFilePath, []byte(content), 0644)
+	return os.WriteFile(io.opFilePath, []byte(content), 0644)
 }
 
-func linesFromFile(path string) ([]string, error) {
+func linesFromFile(path string) ([][]byte, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	return LinesFromReader(f)
+	return linesFromReader(f)
 }
 
-func LinesFromReader(r io.Reader) ([]string, error) {
-	var lines []string
+func linesFromReader(r io.Reader) ([][]byte, error) {
+	var lines [][]byte
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
+		lines = append(lines, scanner.Bytes())
 	}
 	if err := scanner.Err(); err != nil {
 		return nil, err
