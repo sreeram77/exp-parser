@@ -12,12 +12,41 @@ func New() Parser {
 	return parser{}
 }
 
-func (p parser) Parse(data model.TestCases) error {
-	for i := range data.Testcase {
-		// Parse Expression
-		res := expression.ParseExp(data.Testcase[i].Expression, data.Testcase[i].Json)
-		data.Testcase[i].ActualOutput = res
+type response struct {
+	output bool
+	index  int
+}
+
+func (p parser) Parse(data model.TestCases) (model.TestCases, error) {
+	respCh := make(chan response)
+
+	defer func() {
+		close(respCh)
+	}()
+
+	for i, v := range data.Testcase {
+		go func(in int, tc model.TestCase) {
+			result := expression.ParseExp(tc.Expression, tc.Json)
+			r := response{
+				output: result,
+				index:  in,
+			}
+			respCh <- r
+		}(i, v)
 	}
 
-	return nil
+	tCases := make([]model.TestCase, len(data.Testcase))
+
+	for i := 0; i < len(data.Testcase); i++ {
+		select {
+		case out := <-respCh:
+			tCase := data.Testcase[out.index]
+			tCase.ActualOutput = out.output
+			tCases[out.index] = tCase
+		}
+	}
+
+	return model.TestCases{
+		Testcase: tCases,
+	}, nil
 }

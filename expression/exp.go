@@ -54,12 +54,12 @@ func evaluateSubExpression(subExp string, j map[string]interface{}) bool {
 		return evaluateEqual(subExp, j)
 	}
 
-	if strings.Contains(subExp, evalExists) {
-		return evaluateExists(subExp, j)
-	}
-
 	if strings.Contains(subExp, evalNotExists) {
 		return evaluateNotExists(subExp, j)
+	}
+
+	if strings.Contains(subExp, evalExists) {
+		return evaluateExists(subExp, j)
 	}
 
 	return false

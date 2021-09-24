@@ -18,13 +18,13 @@ func main() {
 	}
 
 	// Call parser
-	err = yamlParser.Parse(t)
+	processed, err := yamlParser.Parse(t)
 	if err != nil {
 		panic(err)
 	}
 
 	// Write response in new file
-	err = fileIO.Write(t)
+	err = fileIO.Write(processed)
 	if err != nil {
 		panic(err)
 	}
