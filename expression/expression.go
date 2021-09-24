@@ -5,19 +5,6 @@ import (
 	"strings"
 )
 
-type Exp int
-
-type Expression interface {
-	Evaluate(exp string, json map[string]interface{}) bool
-}
-
-const (
-	Unknown   Exp = iota
-	EqualTo   Exp = 1
-	Exists    Exp = 2
-	NotExists Exp = 3
-)
-
 const (
 	evalEqual          = " == "
 	evalNotExists      = "NOT EXISTS "
@@ -33,25 +20,7 @@ const (
 	evalClosingBracket = ')'
 )
 
-func Type(s string) Exp {
-	if strings.Contains(s, evalEqual) {
-		return EqualTo
-	}
-
-	if strings.Contains(s, evalNotExists) {
-		return NotExists
-	}
-
-	if strings.Contains(s, evalExists) {
-		return Exists
-	}
-
-	return Unknown
-}
-
-type ExpEqual struct{}
-
-func (e ExpEqual) Evaluate(s string, json map[string]interface{}) bool {
+func evaluateEqual(s string, json map[string]interface{}) bool {
 	ops := strings.Split(s, evalEqual)
 	key := strings.Trim(ops[0], evalVar)
 	value := ops[1]
@@ -129,9 +98,7 @@ func compare(op string, value interface{}) bool {
 	return false
 }
 
-type ExpNotExists struct{}
-
-func (e ExpNotExists) Evaluate(s string, json map[string]interface{}) bool {
+func evaluateNotExists(s string, json map[string]interface{}) bool {
 	ops := strings.Split(s, evalNotExists)
 	op := strings.Trim(ops[1], evalVar)
 
@@ -179,9 +146,7 @@ func checkNotExists(key string, json interface{}) bool {
 	return true
 }
 
-type ExpExists struct{}
-
-func (e ExpExists) Evaluate(s string, json map[string]interface{}) bool {
+func evaluateExists(s string, json map[string]interface{}) bool {
 	ops := strings.Split(s, evalExists)
 	op := strings.Trim(ops[1], evalVar)
 

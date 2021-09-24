@@ -7,11 +7,12 @@ import (
 
 func main() {
 
-	// Read file
-	fil := ioutil.New()
+	// Initialize file reader
+	fileIO := ioutil.New()
 	yamlParser := parser.New()
 
-	t, err := fil.Read()
+	// Read file
+	t, err := fileIO.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -23,4 +24,8 @@ func main() {
 	}
 
 	// Write response in new file
+	err = fileIO.Write(t)
+	if err != nil {
+		panic(err)
+	}
 }
